@@ -23,6 +23,11 @@ impl LanguageServer for Backend {
                 text_document_sync: Some(TextDocumentSyncCapability::Kind(
                     TextDocumentSyncKind::FULL,
                 )),
+                completion_provider: Some(CompletionOptions {
+                    resolve_provider: Some(false),
+                    trigger_characters: Some(vec![".".to_string(), " ".to_string()]),
+                    ..Default::default()
+                }),
                 ..Default::default()
             },
             ..Default::default()
@@ -47,5 +52,30 @@ impl LanguageServer for Backend {
 
     async fn shutdown(&self) -> Result<(), tower_lsp::jsonrpc::Error> {
         Ok(())
+    }
+
+    async fn completion(
+        &self,
+        _: CompletionParams,
+    ) -> Result<Option<CompletionResponse>, tower_lsp::jsonrpc::Error> {
+        let items = vec![
+            CompletionItem {
+                label: "print".to_string(),
+                kind: Some(CompletionItemKind::FUNCTION),
+                detail: Some("Built-in function".to_string()),
+                documentation: Some(Documentation::String("Prints to stdout.".into())),
+                insert_text: Some("print ".to_string()),
+                ..Default::default()
+            },
+            CompletionItem {
+                label: "let".to_string(),
+                kind: Some(CompletionItemKind::KEYWORD),
+                detail: Some("Variable declaration".to_string()),
+                insert_text: Some("let ".to_string()),
+                ..Default::default()
+            },
+        ];
+
+        Ok(Some(CompletionResponse::Array(items)))
     }
 }
