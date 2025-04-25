@@ -2,6 +2,7 @@ use crate::parser;
 use tower_lsp::lsp_types::*;
 use tower_lsp::{Client, LanguageServer};
 
+#[derive(Debug)]
 pub struct Backend {
     client: Client,
 }
@@ -28,6 +29,7 @@ impl LanguageServer for Backend {
                     trigger_characters: Some(vec![".".to_string(), " ".to_string()]),
                     ..Default::default()
                 }),
+                hover_provider: Some(HoverProviderCapability::Simple(true)),
                 ..Default::default()
             },
             ..Default::default()
@@ -77,5 +79,18 @@ impl LanguageServer for Backend {
         ];
 
         Ok(Some(CompletionResponse::Array(items)))
+    }
+
+    async fn hover(&self, params: HoverParams) -> Result<Option<Hover>, tower_lsp::jsonrpc::Error> {
+        let position = params.text_document_position_params.position;
+        let hover = Hover {
+            contents: HoverContents::Scalar(MarkedString::String(format!(
+                "You hovered at line {}, character {}",
+                position.line + 1,
+                position.character + 1
+            ))),
+            range: None,
+        };
+        Ok(Some(hover))
     }
 }
