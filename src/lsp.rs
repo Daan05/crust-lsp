@@ -76,6 +76,26 @@ impl LanguageServer for Backend {
                 insert_text: Some("let ".to_string()),
                 ..Default::default()
             },
+            CompletionItem {
+                label: "while".into(),
+                kind: Some(CompletionItemKind::SNIPPET),
+                insert_text_format: Some(InsertTextFormat::SNIPPET),
+                insert_text: Some("while ${1:condition} {\n\t$0\n}".into()),
+                detail: Some("While loop snippet".into()),
+                documentation: Some(Documentation::String("Expands to a while loop.".into())),
+                ..Default::default()
+            },
+            CompletionItem {
+                label: "for".into(),
+                kind: Some(CompletionItemKind::SNIPPET),
+                insert_text_format: Some(InsertTextFormat::SNIPPET),
+                insert_text: Some(
+                    "for (let ${1:i} = ${2:0}; ${1} < ${4:n}; ${1}++) {\n\t$0\n}".into(),
+                ),
+                detail: Some("For loop snippet".into()),
+                documentation: Some(Documentation::String("Expands to a for loop.".into())),
+                ..Default::default()
+            },
         ];
 
         Ok(Some(CompletionResponse::Array(items)))
