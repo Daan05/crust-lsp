@@ -30,6 +30,7 @@ impl LanguageServer for Backend {
                     ..Default::default()
                 }),
                 hover_provider: Some(HoverProviderCapability::Simple(true)),
+                definition_provider: Some(OneOf::Left(true)),
                 ..Default::default()
             },
             ..Default::default()
@@ -112,5 +113,30 @@ impl LanguageServer for Backend {
             range: None,
         };
         Ok(Some(hover))
+    }
+
+    async fn goto_definition(
+        &self,
+        params: GotoDefinitionParams,
+    ) -> Result<Option<GotoDefinitionResponse>, tower_lsp::jsonrpc::Error> {
+        let _position = params.text_document_position_params.position;
+        let uri = params.text_document_position_params.text_document.uri;
+
+        // TODO: Real lookup logic here — for now return dummy
+        let location = Location {
+            uri: uri.clone(), // Same file
+            range: Range {
+                start: Position {
+                    line: 0,
+                    character: 0,
+                },
+                end: Position {
+                    line: 0,
+                    character: 5,
+                },
+            },
+        };
+
+        Ok(Some(GotoDefinitionResponse::Scalar(location)))
     }
 }
